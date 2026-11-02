@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A countdown timer for birthdays, vacations, New Year, and custom events." />
+    <title>Countdown to an Important Event</title>
+    <!-- Google Fonts work from file:// because they are loaded from a public CDN. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Outfit:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Soft animated background layers (pure CSS, no images required). -->
+    <div class="bg-glow bg-glow--one" aria-hidden="true"></div>
+    <div class="bg-glow bg-glow--two" aria-hidden="true"></div>
+    <div class="bg-glow bg-glow--three" aria-hidden="true"></div>
+
+    <div class="page">
+      <header class="hero">
+        <p class="eyebrow">Your personal countdown</p>
+        <h1>Countdown to an Important Event</h1>
+        <p class="lede">
+          Add as many countdowns as you like—birthdays, vacations, New Year, or
+          custom dates. Every timer, plus the daily fact, photo, and quote, stays
+          saved on this device.
+        </p>
+      </header>
+
+      <main>
+        <section class="card picker-card" aria-labelledby="choose-heading">
+          <div class="card-heading">
+            <h2 id="choose-heading">Add an event</h2>
+            <p>Each new countdown is added to your list. The app will ask for confirmation before it is saved or removed.</p>
+          </div>
+
+          <div class="event-buttons" role="group" aria-label="Event types">
+            <button type="button" class="chip" data-event-type="birthday">Birthday</button>
+            <button type="button" class="chip" data-event-type="vacation">Vacation</button>
+            <button type="button" class="chip" data-event-type="newyear">New Year</button>
+            <button type="button" class="chip" data-event-type="custom">Custom</button>
+          </div>
+
+          <!-- Shown for Birthday, Vacation, and Custom. New Year is applied immediately. -->
+          <form id="event-form" class="event-form is-hidden" novalidate>
+            <div class="field" id="name-field">
+              <label for="event-name">Event name</label>
+              <input
+                id="event-name"
+                name="eventName"
+                type="text"
+                maxlength="60"
+                autocomplete="off"
+                placeholder="My special day"
+              />
+            </div>
+            <div class="field">
+              <label for="event-date">Event date</label>
+              <input id="event-date" name="eventDate" type="date" required />
+            </div>
+            <p id="form-error" class="form-error" role="alert" hidden></p>
+            <button type="submit" class="primary-btn">Add countdown</button>
+          </form>
+        </section>
+
+        <section class="timers-section" aria-live="polite" aria-labelledby="timers-heading">
+          <div class="timers-heading">
+            <h2 id="timers-heading">Your timers</h2>
+            <p id="timer-count">No countdowns yet</p>
+          </div>
+
+          <div id="empty-state" class="card empty-state">
+            <p class="empty-kicker">No event yet</p>
+            <h2>Start by adding something to wait for</h2>
+            <p>Each event name, date, and remaining time will appear in a compact card here.</p>
+          </div>
+
+          <div id="timers" class="timers"></div>
+        </section>
+
+        <!-- One copy of a timer card is cloned in JavaScript for every saved event. -->
+        <template id="timer-template">
+          <article class="card timer-card">
+            <button type="button" class="remove-btn" aria-label="Remove countdown">Remove</button>
+            <p class="event-type-label" data-role="type"></p>
+            <h3 data-role="title">Event</h3>
+            <p class="event-date-line" data-role="date"></p>
+            <div class="countdown" data-role="countdown" hidden>
+              <div class="time-box">
+                <span class="time-value" data-unit="days">00</span>
+                <span class="time-label">Days</span>
+              </div>
+              <div class="time-box">
+                <span class="time-value" data-unit="hours">00</span>
+                <span class="time-label">Hours</span>
+              </div>
+              <div class="time-box">
+                <span class="time-value" data-unit="minutes">00</span>
+                <span class="time-label">Minutes</span>
+              </div>
+              <div class="time-box">
+                <span class="time-value" data-unit="seconds">00</span>
+                <span class="time-label">Seconds</span>
+              </div>
+            </div>
+            <p class="passed-message" data-role="passed" hidden>
+              The event has already taken place!
+            </p>
+          </article>
+        </template>
+
+        <section class="daily-grid" aria-label="Daily extras">
+          <article class="card daily-card">
+            <p class="card-kicker">Fact of the Day</p>
+            <h2>Something worth knowing</h2>
+            <p id="daily-fact" class="daily-text"></p>
+          </article>
+
+          <article class="card daily-card image-card">
+            <p class="card-kicker">Image of the Day</p>
+            <h2 id="daily-image-title">A matching scene</h2>
+            <figure>
+              <!--
+                Remote photos are loaded with a regular <img> tag so they work
+                when the page is opened from disk. If the image cannot load,
+                a CSS illustration is shown instead.
+              -->
+              <div class="photo-frame">
+                <img id="daily-image" alt="Thematic photo of the day" />
+                <div class="photo-fallback" aria-hidden="true"></div>
+              </div>
+              <figcaption id="daily-image-caption"></figcaption>
+            </figure>
+          </article>
+
+          <article class="card daily-card">
+            <p class="card-kicker">Phrase of the Day</p>
+            <h2>A little extra spark</h2>
+            <blockquote id="daily-quote" class="daily-quote"></blockquote>
+          </article>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <p>Made as a school project with HTML, CSS, and JavaScript. Your timers are saved in this browser only.</p>
+      </footer>
+    </div>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>
